@@ -19,7 +19,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   rmse << 0, 0, 0, 0;
 
   if (estimations.size() != ground_truth.size() || estimations.size() == 0){
-    cout << "Invalid Estimations and/or Ground truth provided";
+    std::cout << "Invalid Estimations and/or Ground truth provided"  << "\n";
     return rmse;
   }
 
@@ -43,4 +43,25 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   TODO:
     * Calculate a Jacobian here.
   */
+  MatrixXd Hj(3, 4);
+
+  float px = x_state(0);
+  float py = x_state(1);
+  float vx = x_state(2);
+  float vy = x_state(3);
+
+  float c1 = px*px + py*py;
+  float c2 = sqrt(c1);
+  float c3 = (c1 * c2);
+
+  if (c1 < 0.0001){
+    std:std::cout << "CalculateJacobian() - Divide by zero error" << '\n';
+    return Hj;
+  }
+
+  Hj << (px / c2), (py / c2), 0, 0,
+    -(py / c1), (px / c1), 0, 0,
+    py*(vx*py - vy*px) / c3, px*(px*vy - py*vx) / c3, px / c2, py / c2;
+
+  return Hj;
 }
